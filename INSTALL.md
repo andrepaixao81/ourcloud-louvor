@@ -112,7 +112,7 @@ cd ourcloud-louvor
 sudo apt update
 sudo apt install -y unzip
 cd /home/ubuntu
-unzip OurCloud-Louvor-v1.0.0-rc88-GitHub.zip
+unzip OurCloud-Louvor-v1.0.0-rc94-GitHub.zip
 cd ourcloud-louvor
 ```
 
@@ -125,7 +125,7 @@ cat VERSION
 Esperado:
 
 ```text
-1.0.0-rc88
+1.0.0-rc94
 ```
 
 ## 6. Execute a instalação

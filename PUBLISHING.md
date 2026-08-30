@@ -98,8 +98,8 @@ Em **Settings**:
 ## 8. Crie a primeira tag
 
 ```bash
-git tag -a v1.0.0-rc88 -m "OurCloud Louvor v1.0.0-rc88"
-git push origin v1.0.0-rc88
+git tag -a v1.0.0-rc94 -m "OurCloud Louvor v1.0.0-rc94"
+git push origin v1.0.0-rc94
 ```
 
 ## 9. Crie a Release
@@ -108,8 +108,8 @@ No GitHub:
 
 1. abra **Releases**;
 2. clique em **Draft a new release**;
-3. escolha `v1.0.0-rc88`;
-4. título: `OurCloud Louvor v1.0.0-rc88`;
+3. escolha `v1.0.0-rc94`;
+4. título: `OurCloud Louvor v1.0.0-rc94`;
 5. marque como **pre-release**, pois ainda é RC;
 6. use `RELEASE_NOTES.md` como base;
 7. anexe o ZIP de distribuição e seu SHA-256, se desejar.

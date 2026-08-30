@@ -14,7 +14,7 @@ $verify = $read('scripts/verify-install.sh');
 $actions = $read('app/Http/Controllers/ActionCenterController.php');
 $version = trim($read('VERSION'));
 
-$check(in_array($version, ['1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88'], true), 'Linha RC86+ identificada.');
+$check(in_array($version, ['1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88', '1.0.0-rc89', '1.0.0-rc90', '1.0.0-rc91', '1.0.0-rc92', '1.0.0-rc93', '1.0.0-rc94'], true), 'Linha RC86+ identificada.');
 $check(str_contains($user, 'canViewBirthdays()'), 'Autorização de aniversariantes está centralizada no modelo User.');
 $check(str_contains($actions, 'if ($request->user()->canViewBirthdays())'), 'Central de Ações respeita a mesma autorização de aniversários.');
 $check(str_contains($update, 'ensure_backup_runtime') && str_contains($update, 'SGML_BACKUP_PATH'), 'Atualizador autocorrige runtime de backup antes da validação.');

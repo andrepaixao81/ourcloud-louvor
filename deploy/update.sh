@@ -270,9 +270,9 @@ cd "$APP_DIR"
 
 # Atualiza somente a informação de versão, preservando todo o restante do .env.
 if grep -q '^APP_VERSION=' .env; then
-  sed -i 's/^APP_VERSION=.*/APP_VERSION=1.0.0-rc88/' .env
+  sed -i 's/^APP_VERSION=.*/APP_VERSION=1.0.0-rc94/' .env
 else
-  printf '\nAPP_VERSION=1.0.0-rc88\n' >> .env
+  printf '\nAPP_VERSION=1.0.0-rc94\n' >> .env
 fi
 
 # Componentes operacionais da release.
@@ -353,6 +353,7 @@ $PHP_BIN scripts/smoke-rc85-friendly-403.php
 $PHP_BIN scripts/smoke-rc86-birthday-privacy-backup-runtime.php
 $PHP_BIN scripts/smoke-rc87-birthday-member-only-backup-path.php
 $PHP_BIN scripts/smoke-rc88-open-source.php
+$PHP_BIN scripts/smoke-rc89-operational-cleanup-recurrence.php
 
 # Última normalização depois de Artisan/caches: nenhuma etapa posterior pode deixar
 # public/build em 0750/0640.

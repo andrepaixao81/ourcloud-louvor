@@ -23,25 +23,43 @@
         </div>
 
         @if($canManage)
-            <div class="mb-5 rounded-xl bg-indigo-50 px-3 py-2 text-sm text-indigo-800">
-                Não há etapa de aprovação do repertório. O ministro responsável pode incluir, remover e corrigir louvores, tom, nota e observações. Depois do horário final do culto, essas correções também atualizam “Louvores ministrados”.
-                <div class="mt-2 font-semibold">RC84: o tom agora fica vinculado ao ministro. Ao selecionar ministro + louvor, o último tom usado por essa pessoa é sugerido automaticamente.</div>
+            <div class="mb-6 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4">
+                <div class="mb-3 text-xs font-black uppercase tracking-[.14em] text-indigo-600">Como montar o repertório</div>
+                <div class="grid gap-2 md:grid-cols-3">
+                    <div class="flex items-start gap-3 rounded-xl bg-white p-3 ring-1 ring-indigo-100">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-black text-indigo-700">1</span>
+                        <div><div class="font-black text-slate-900">Abertura <span class="font-semibold text-slate-400">(opcional)</span></div><p class="mt-0.5 text-xs text-slate-500">Um louvor antes da sequência principal. Ele não entra na numeração.</p></div>
+                    </div>
+                    <div class="flex items-start gap-3 rounded-xl bg-white p-3 ring-1 ring-indigo-100">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-black text-violet-700">2</span>
+                        <div><div class="font-black text-slate-900">Louvores da ministração</div><p class="mt-0.5 text-xs text-slate-500">Adicione Louvor 1, Louvor 2, Louvor 3... na ordem que serão ministrados.</p></div>
+                    </div>
+                    <div class="flex items-start gap-3 rounded-xl bg-white p-3 ring-1 ring-indigo-100">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xs font-black text-emerald-700">3</span>
+                        <div><div class="font-black text-slate-900">Conferir e avisar equipe</div><p class="mt-0.5 text-xs text-slate-500">Revise a ordem, ministros e tons. Depois confirme para avisar os músicos.</p></div>
+                    </div>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">Cada alteração salva já aparece na escala e na agenda. O último tom usado por cada ministro é sugerido automaticamente.</p>
             </div>
         @endif
 
-        <details class="mb-5 rounded-xl border border-indigo-200 bg-indigo-50/30 p-4" open>
+        <details class="mb-6 rounded-2xl border border-sky-200 bg-sky-50/40 p-4" @if(!$repertoire->openingSong) open @endif>
             <summary class="cursor-pointer list-none">
                 <div class="flex items-center justify-between gap-3">
                     <div>
-                        <div class="font-black text-indigo-950">Louvor de abertura do culto</div>
-                        <p class="text-xs text-slate-500">Use o mesmo fluxo dos demais louvores: pesquisar, selecionar e salvar. Se não encontrar, cadastre um novo louvor aqui mesmo.</p>
+                        <div class="flex items-center gap-2">
+                            <span class="rounded-full bg-sky-100 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-sky-700">Etapa 1</span>
+                            <span class="rounded-full bg-white px-2 py-1 text-[10px] font-bold text-slate-500 ring-1 ring-slate-200">Opcional</span>
+                        </div>
+                        <div class="mt-2 font-black text-slate-950">Abertura</div>
+                        <p class="mt-1 text-xs text-slate-500">Se o culto tiver um louvor antes da sequência principal, defina aqui. <strong>Ele não será contado como Louvor 1.</strong></p>
                     </div>
-                    <span class="text-sm font-semibold text-indigo-700">Selecionar abertura</span>
+                    <span class="text-sm font-semibold text-sky-700">{{ $repertoire->openingSong ? 'Alterar abertura' : 'Definir abertura' }}</span>
                 </div>
             </summary>
 
             @if($canManage)
-                <div class="mt-4 border-t border-indigo-100 pt-4">
+                <div class="mt-4 border-t border-sky-100 pt-4">
                     <div class="mb-4 grid gap-3 md:grid-cols-2">
                         <div>
                             <label class="sgml-label">Buscar na biblioteca</label>
@@ -124,7 +142,7 @@
                     </details>
                 </div>
             @elseif($repertoire->openingSong)
-                <div class="mt-4 border-t border-indigo-100 pt-4 text-sm">
+                <div class="mt-4 border-t border-sky-100 pt-4 text-sm">
                     <strong>{{ $repertoire->openingSong->title }}</strong>
                     @if($repertoire->openingMinister)<span class="text-slate-500"> · {{ $repertoire->openingMinister->display_name }}</span>@endif
                     @if($repertoire->opening_key)<span class="sgml-badge-info ml-1">Tom {{ $repertoire->opening_key }}</span>@endif
@@ -136,10 +154,17 @@
         </details>
 
         @if($canManage)
-            <div class="mb-5 rounded-xl border border-indigo-200 bg-white p-4">
-            <div class="mb-4">
-                <h3 class="font-black text-indigo-950">Adicionar louvores ao repertório</h3>
-                <p class="text-sm text-slate-500">Pesquise e adicione Louvor 1, Louvor 2, Louvor 3... na ordem desejada.</p>
+            <div class="mb-6 rounded-2xl border border-violet-200 bg-white p-4 shadow-sm">
+            <div class="mb-4 flex flex-wrap items-start justify-between gap-3 border-b border-violet-100 pb-4">
+                <div>
+                    <div class="mb-2 inline-flex items-center gap-2">
+                        <span class="rounded-full bg-violet-100 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-violet-700">Etapa 2</span>
+                        <span class="text-xs font-semibold text-slate-400">Principal</span>
+                    </div>
+                    <h3 class="font-black text-slate-950">Adicionar louvores da ministração</h3>
+                    <p class="mt-1 text-sm text-slate-500">Aqui entram somente os louvores numerados: <strong>Louvor 1, Louvor 2, Louvor 3...</strong></p>
+                </div>
+                <div class="rounded-xl bg-violet-50 px-3 py-2 text-xs font-semibold text-violet-700">{{ $items->count() }} louvor(es) principal(is)</div>
             </div>
             <div class="mb-4 grid gap-3 md:grid-cols-2">
                 <div><label class="sgml-label">Buscar</label><input wire:model.live.debounce.300ms="songSearch" class="sgml-input" placeholder="Ex.: Canção de Gratidão"></div>
@@ -217,9 +242,37 @@
         </div>
     @endif
 
-        <div class="mb-3">
-            <h3 class="font-black">Louvores do repertório</h3>
-            <p class="text-xs text-slate-500">A numeração abaixo é independente do louvor de abertura.</p>
+        <div class="mb-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <div class="mb-2 inline-flex rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-700">Etapa 3 · Ordem final</div>
+                    <h3 class="font-black text-slate-950">Confira como o repertório será apresentado à equipe</h3>
+                    <p class="mt-1 text-sm text-slate-500">A abertura aparece separada. A sequência principal começa sempre em <strong>Louvor 1</strong>.</p>
+                </div>
+                <div class="text-xs font-semibold text-slate-500">{{ ($repertoire->openingSong ? 1 : 0) + $items->count() }} item(ns) no total</div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+                @if($repertoire->openingSong)
+                    @php
+                        $openingPreviewVersion = $repertoire->openingSong->versions->firstWhere('is_default', true) ?? $repertoire->openingSong->versions->first();
+                        $openingPreviewKey = $repertoire->opening_key ?: $openingPreviewVersion?->original_key;
+                    @endphp
+                    <div class="flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-white p-3">
+                        <span class="rounded-lg bg-sky-100 px-2.5 py-1 text-xs font-black text-sky-700">ABERTURA</span>
+                        <div class="min-w-0 flex-1"><div class="font-black text-slate-900">{{ $repertoire->openingSong->title }}</div><div class="mt-0.5 text-xs text-slate-500">Não entra na numeração dos louvores principais.</div></div>
+                        @if($repertoire->openingMinister)<span class="sgml-badge bg-violet-50 text-violet-700">{{ $repertoire->openingMinister->display_name }}</span>@endif
+                        @if($openingPreviewKey)<span class="sgml-badge-info">Tom {{ $openingPreviewKey }}</span>@endif
+                    </div>
+                @else
+                    <div class="rounded-xl border border-dashed border-sky-200 bg-white px-3 py-2 text-xs text-slate-500"><strong>Abertura:</strong> não definida. Isso é opcional.</div>
+                @endif
+            </div>
+        </div>
+
+        <div class="mb-3 flex items-end justify-between gap-3">
+            <div><h3 class="font-black">Louvores principais</h3><p class="text-xs text-slate-500">Esta é a sequência numerada que será ministrada após a abertura.</p></div>
+            @if($items->isNotEmpty())<span class="text-xs font-semibold text-violet-700">Arraste pelo ☰ para mudar a ordem</span>@endif
         </div>
 
         <ul wire:sort="handleSort" class="space-y-3">
@@ -228,10 +281,10 @@
                     $itemDefaultVersion = $item->song->versions->firstWhere('is_default', true) ?? $item->song->versions->first();
                     $itemArtist = $item->song->artist_reference ?: ($itemDefaultVersion?->artist);
                 @endphp
-                <li wire:key="rep-{{ $item->id }}" wire:sort:item="{{ $item->id }}" class="rounded-xl border border-slate-200 p-3">
+                <li wire:key="rep-{{ $item->id }}" wire:sort:item="{{ $item->id }}" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                     <div class="flex items-center gap-3">
                         @if($canManage)<span wire:sort:handle class="cursor-grab text-slate-400">☰</span>@endif
-                        <span class="shrink-0 rounded-lg bg-indigo-50 px-2 py-1 text-xs font-black text-indigo-700">Louvor {{ $loop->iteration }}</span>
+                        <span class="shrink-0 rounded-lg bg-violet-100 px-2.5 py-1 text-xs font-black text-violet-700">LOUVOR {{ $loop->iteration }}</span>
                         <div class="min-w-0 flex-1">
                             <div class="font-semibold">{{ $item->song->title }}</div>
                             <div class="mt-0.5 text-xs text-slate-500">{{ $item->song->category?->name ?? 'Sem categoria' }}@if($itemArtist) · {{ $itemArtist }}@endif</div>
@@ -254,7 +307,10 @@
                     @endif
                 </li>
             @empty
-                <li class="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">Nenhum louvor adicionado.</li>
+                <li class="rounded-2xl border border-dashed border-violet-200 bg-violet-50/30 p-8 text-center">
+                    <div class="font-black text-slate-700">Nenhum louvor principal adicionado</div>
+                    <p class="mt-1 text-sm text-slate-500">Use a Etapa 2 acima para adicionar Louvor 1, Louvor 2, Louvor 3...</p>
+                </li>
             @endforelse
         </ul>
 
@@ -276,8 +332,8 @@
             <div class="mt-5 rounded-xl border {{ $hasUnannouncedChanges ? 'border-indigo-200 bg-indigo-50' : 'border-emerald-200 bg-emerald-50' }} p-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <div class="font-black">Confirmar repertório e avisar equipe</div>
-                        <p class="mt-1 text-sm text-slate-600">As alterações continuam sendo salvas e refletidas na agenda imediatamente. Use este botão quando terminar a montagem para avisar a equipe que o repertório está pronto.</p>
+                        <div class="font-black">Repertório pronto? Avisar a equipe</div>
+                        <p class="mt-1 text-sm text-slate-600">As alterações continuam sendo salvas e refletidas na agenda imediatamente. Quando a ordem, os ministros e os tons estiverem conferidos, use este botão para avisar os músicos que o repertório está pronto.</p>
                         @if(!$hasUnannouncedChanges && $repertoire->announced_at)
                             <p class="mt-1 text-xs font-semibold text-emerald-700">Revisão {{ $repertoire->announced_revision }} confirmada em {{ $repertoire->announced_at->format('d/m/Y H:i') }}.</p>
                         @endif

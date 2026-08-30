@@ -103,6 +103,7 @@ class TeamNotificationService
         $settings = WhatsappSetting::query()->where('organization_id', $organizationId)->first();
         $queued = 0;
         $internal = 0;
+        $spacingSeconds = $settings?->batchSpacingSeconds() ?? 1;
 
         foreach ($users as $user) {
             try {
@@ -140,7 +141,9 @@ class TeamNotificationService
                 'status' => 'queued',
             ]);
 
-            SendWhatsappNotificationJob::dispatch($log->id)->afterCommit();
+            SendWhatsappNotificationJob::dispatch($log->id)
+                ->delay(now()->addSeconds($queued * $spacingSeconds))
+                ->afterCommit();
             $queued++;
         }
 

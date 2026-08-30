@@ -104,3 +104,8 @@ A Administração continua podendo informar o telefone pelo cadastro de Pessoas;
 ## Felicitações de aniversário
 
 A RC81 pode enviar automaticamente uma mensagem no dia do aniversário usando o mesmo provedor WhatsApp configurado para a organização. A mensagem e o horário são configurados em **Aniversariantes** por Administrador ou Responsável pelo Ministério. O sistema usa o telefone cadastrado na Pessoa, evita envio duplicado no mesmo dia e não inclui idade ou ano de nascimento na lista de aniversariantes.
+
+
+## Limpeza de falhas e cancelados (RC93)
+
+Na Administração > WhatsApp, o Administrador pode escolher **Remover falhas/cancelados** quando não desejar reenviar mensagens que falharam. A ação remove somente registros `failed`, `cancelled` e `skipped`; mensagens `sent` permanecem como histórico. Se houver jobs `queued/retrying`, use antes **Limpar fila pendente**.

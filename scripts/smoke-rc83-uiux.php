@@ -41,7 +41,7 @@ $check(str_contains($adminUsers, 'Perfis de acesso') && str_contains($adminUsers
 $check(str_contains($js, 'data-confirm-dialog') && str_contains($js, 'confirmReasonLabel') && ! str_contains($views, 'return confirm(') && ! str_contains($views, 'prompt('), 'Confirmações críticas usam modal próprio, inclusive justificativas.');
 $check(str_contains($js, 'data-page-loader') && str_contains($css, 'sgml-loading-skeleton'), 'Navegação possui feedback de carregamento e skeleton.');
 $check(str_contains($css, 'sgml-badge-success') && str_contains($css, 'sgml-badge-warning') && str_contains($css, 'sgml-badge-danger'), 'Design system padroniza estados sem depender apenas de cor.');
-$check(in_array(trim($read('VERSION')), ['1.0.0-rc83', '1.0.0-rc84', '1.0.0-rc85', '1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88'], true), 'Versão da distribuição preserva a base RC83 de UI/UX.');
+$check(in_array(trim($read('VERSION')), ['1.0.0-rc83', '1.0.0-rc84', '1.0.0-rc85', '1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88', '1.0.0-rc89', '1.0.0-rc90', '1.0.0-rc91', '1.0.0-rc92', '1.0.0-rc93', '1.0.0-rc94'], true), 'Versão da distribuição preserva a base RC83 de UI/UX.');
 
 if ($failed) {
     fwrite(STDERR, "Resultado: FALHA ($failed de $checks)\n");

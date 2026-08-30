@@ -9,6 +9,7 @@ use App\Services\TeamNotificationService;
 use App\Services\WhatsappGatewayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -29,8 +30,30 @@ class WhatsappSettingsController extends Controller
             ]
         );
 
-        $logs = WhatsappDeliveryLog::query()->latest()->limit(30)->get();
-        return view('admin.whatsapp', compact('setting', 'logs'));
+        $logs = WhatsappDeliveryLog::query()->latest()->limit(50)->get();
+        $failedRecent = WhatsappDeliveryLog::query()
+            ->whereIn('status', ['failed', 'retrying'])
+            ->where('created_at', '>=', now()->subDay())
+            ->count();
+        $discardableUnsent = WhatsappDeliveryLog::query()
+            ->whereIn('status', ['failed', 'cancelled', 'skipped'])
+            ->count();
+        $queuedLogs = WhatsappDeliveryLog::query()
+            ->whereIn('status', ['queued', 'retrying'])
+            ->get(['id', 'created_at']);
+        $queuedWhatsapp = $queuedLogs->count();
+        $queueJobs = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('jobs') && $queuedLogs->isNotEmpty()) {
+            $ids = $queuedLogs->pluck('id')->map(fn ($id) => (string) $id)->all();
+            $queueJobsQuery = DB::table('jobs')->where('payload', 'like', '%SendWhatsappNotificationJob%');
+            $queueJobsQuery->where(function ($query) use ($ids): void {
+                foreach ($ids as $id) $query->orWhere('payload', 'like', '%'.$id.'%');
+            });
+            $queueJobs = $queueJobsQuery->count();
+        }
+        $oldestQueuedAt = $queuedLogs->min('created_at');
+        $queueMayBeStopped = $oldestQueuedAt && now()->diffInMinutes($oldestQueuedAt) >= 2;
+        return view('admin.whatsapp', compact('setting', 'logs', 'failedRecent', 'discardableUnsent', 'queuedWhatsapp', 'queueJobs', 'oldestQueuedAt', 'queueMayBeStopped'));
     }
 
     public function update(Request $request)
@@ -106,7 +129,7 @@ class WhatsappSettingsController extends Controller
         return back()->with($result['ok'] ? 'status' : 'error', $result['message']);
     }
 
-    public function test(Request $request, TeamNotificationService $teamNotifications)
+    public function test(Request $request, TeamNotificationService $teamNotifications, WhatsappGatewayService $gateway)
     {
         $data = $request->validate(['phone' => ['required', 'string', 'max:40']]);
         $setting = WhatsappSetting::query()->where('organization_id', $request->user()->organization_id)->firstOrFail();
@@ -124,10 +147,130 @@ class WhatsappSettingsController extends Controller
             'title' => 'Teste do OurCloud Louvor',
             'summary' => 'A integração automática de avisos do SGML está funcionando.',
             'action_url' => route('home'),
-            'status' => 'queued',
+            'status' => 'sending',
         ]);
-        SendWhatsappNotificationJob::dispatch($log->id);
 
-        return back()->with('status', 'Mensagem de teste colocada na fila pelo provedor selecionado. Consulte o histórico abaixo.');
+        // RC91: o teste administrativo não depende da fila. Isso separa claramente
+        // falha de conexão/provedor de um eventual problema no worker da queue.
+        try {
+            $result = $gateway->send($setting, $log);
+            $log->update([
+                'status' => 'sent',
+                'provider' => $result['provider'],
+                'provider_message_id' => $result['message_id'],
+                'error' => null,
+                'sent_at' => now(),
+            ]);
+
+            return back()->with('status', 'Mensagem de teste enviada imediatamente pelo provedor. A integração está respondendo.');
+        } catch (\Throwable $exception) {
+            $log->update([
+                'status' => 'failed',
+                'provider' => $setting->selectedProvider(),
+                'error' => Str::limit($exception->getMessage(), 2000, ''),
+            ]);
+            report($exception);
+
+            return back()->with('error', 'O teste chegou ao provedor, mas falhou: '.Str::limit($exception->getMessage(), 500, ''));
+        }
     }
+
+    public function retryFailed(Request $request)
+    {
+        $setting = WhatsappSetting::query()->where('organization_id', $request->user()->organization_id)->firstOrFail();
+        if (! $setting->isConfigured()) {
+            throw ValidationException::withMessages(['provider' => 'A integração precisa estar habilitada e com credenciais salvas antes do reenvio.']);
+        }
+
+        $logs = WhatsappDeliveryLog::query()
+            ->where('organization_id', $request->user()->organization_id)
+            ->whereIn('status', ['failed', 'retrying'])
+            ->where('created_at', '>=', now()->subDay())
+            ->oldest()
+            ->limit(100)
+            ->get();
+
+        if ($logs->isEmpty()) {
+            return back()->with('status', 'Não há falhas recentes para reenviar.');
+        }
+
+        $spacing = $setting->batchSpacingSeconds();
+        foreach ($logs->values() as $index => $log) {
+            $log->update(['status' => 'queued', 'error' => null, 'sent_at' => null]);
+            SendWhatsappNotificationJob::dispatch($log->id)->delay(now()->addSeconds($index * $spacing));
+        }
+
+        return back()->with('status', $logs->count().' envio(s) recolocado(s) na fila com espaçamento de '.$spacing.'s entre mensagens.');
+    }
+
+    public function clearQueue(Request $request)
+    {
+        $data = $request->validate([
+            'confirmation' => ['required', 'in:LIMPAR FILA'],
+        ]);
+        $organizationId = (string) $request->user()->organization_id;
+
+        $logs = WhatsappDeliveryLog::query()->withoutGlobalScopes()
+            ->where('organization_id', $organizationId)
+            ->whereIn('status', ['queued', 'retrying'])
+            ->get();
+        $logIds = $logs->pluck('id')->map(fn ($id) => (string) $id)->all();
+
+        $deletedJobs = 0;
+        DB::transaction(function () use ($logs, $logIds, &$deletedJobs): void {
+            // O payload da fila Laravel contém o nome da classe serializada. Filtramos
+            // também pelos IDs dos logs quando possível para não afetar jobs Google/outros.
+            if ($logIds !== [] && \Illuminate\Support\Facades\Schema::hasTable('jobs')) {
+                $query = DB::table('jobs')->where('payload', 'like', '%SendWhatsappNotificationJob%');
+                $query->where(function ($q) use ($logIds): void {
+                    foreach ($logIds as $id) {
+                        $q->orWhere('payload', 'like', '%'.$id.'%');
+                    }
+                });
+                $deletedJobs = $query->delete();
+            }
+
+            foreach ($logs as $log) {
+                $log->update([
+                    'status' => 'cancelled',
+                    'error' => 'Cancelado manualmente pelo Administrador ao limpar a fila.',
+                    'sent_at' => null,
+                ]);
+            }
+        });
+
+        return back()->with('status', 'Fila do WhatsApp limpa: '.$logs->count().' aviso(s) cancelado(s) e '.$deletedJobs.' job(s) removido(s). O histórico enviado/falho foi preservado.');
+    }
+
+    /**
+     * RC93: remove do painel os registros que não foram entregues, sem reenviá-los.
+     * Mensagens com status sent são preservadas como histórico de entrega. Jobs ainda
+     * associados a queued/retrying não entram aqui; devem ser cancelados pela limpeza
+     * da fila para evitar condição de corrida com o worker.
+     */
+    public function purgeUnsentHistory(Request $request)
+    {
+        $data = $request->validate([
+            'confirmation' => ['required', 'in:REMOVER NAO ENVIADOS'],
+        ]);
+
+        $organizationId = (string) $request->user()->organization_id;
+
+        $pending = WhatsappDeliveryLog::query()->withoutGlobalScopes()
+            ->where('organization_id', $organizationId)
+            ->whereIn('status', ['queued', 'retrying'])
+            ->count();
+
+        if ($pending > 0) {
+            return back()->with('error', 'Ainda existem '.$pending.' aviso(s) pendente(s). Use primeiro “Limpar fila pendente” para cancelar os jobs em segurança.');
+        }
+
+        $deleted = WhatsappDeliveryLog::query()->withoutGlobalScopes()
+            ->where('organization_id', $organizationId)
+            ->whereIn('status', ['failed', 'cancelled', 'skipped'])
+            ->delete();
+
+        return back()->with('status', $deleted.' registro(s) não enviado(s) removido(s) do histórico. Mensagens ENVIADAS foram preservadas.');
+    }
+
 }

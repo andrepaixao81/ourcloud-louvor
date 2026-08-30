@@ -16,8 +16,14 @@ class SendWhatsappNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries = 3;
+    public int $tries = 4;
     public int $timeout = 45;
+
+    /** @return array<int,int> */
+    public function backoff(): array
+    {
+        return [10, 30, 90];
+    }
 
     public function __construct(public readonly string $deliveryLogId)
     {
@@ -26,7 +32,9 @@ class SendWhatsappNotificationJob implements ShouldQueue
     public function handle(WhatsappGatewayService $gateway): void
     {
         $log = WhatsappDeliveryLog::query()->withoutGlobalScopes()->find($this->deliveryLogId);
-        if (! $log || $log->status === 'sent') {
+        if (! $log || ! in_array($log->status, ['queued', 'retrying'], true)) {
+            // RC91: logs cancelados/ignorados/enviados não podem ser disparados por
+            // um worker que já havia reservado o job antes da limpeza da fila.
             return;
         }
 
@@ -49,10 +57,11 @@ class SendWhatsappNotificationJob implements ShouldQueue
                 'sent_at' => now(),
             ]);
         } catch (\Throwable $exception) {
+            $willRetry = $this->attempts() < $this->tries;
             $log->update([
-                'status' => 'failed',
+                'status' => $willRetry ? 'retrying' : 'failed',
                 'provider' => $settings->selectedProvider(),
-                'error' => Str::limit($exception->getMessage(), 2000, ''),
+                'error' => Str::limit('Tentativa '.$this->attempts().'/'.$this->tries.' · '.$exception->getMessage(), 2000, ''),
             ]);
             throw $exception;
         }

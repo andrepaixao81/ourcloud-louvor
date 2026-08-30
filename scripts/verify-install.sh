@@ -70,6 +70,11 @@ if [[ "$VENDOR_OK" -eq 1 ]]; then
   sudo -u sgml "$PHP_BIN" scripts/smoke-rc86-birthday-privacy-backup-runtime.php && ok 'Privacidade de aniversários e runtime de backup RC86' || fail 'Privacidade de aniversários e runtime de backup RC86'
   sudo -u sgml "$PHP_BIN" scripts/smoke-rc87-birthday-member-only-backup-path.php && ok 'Aniversariantes por perfil e travessia de backup RC87' || fail 'Aniversariantes por perfil e travessia de backup RC87'
   sudo -u sgml "$PHP_BIN" scripts/smoke-rc88-open-source.php && ok 'Metadados open source e documentação RC88' || fail 'Metadados open source e documentação RC88'
+  sudo -u sgml "$PHP_BIN" scripts/smoke-rc89-operational-cleanup-recurrence.php && ok 'Recorrência canônica e limpeza operacional RC89' || fail 'Recorrência canônica e limpeza operacional RC89'
+  sudo -u sgml "$PHP_BIN" scripts/smoke-rc90-cleanup-users-whatsapp.php && ok 'Limpeza, contas e WhatsApp RC90' || fail 'Limpeza, contas e WhatsApp RC90'
+  sudo -u sgml "$PHP_BIN" scripts/smoke-rc91-admin-recovery.php && ok 'Fila WhatsApp, remoção de conta e limpeza robusta RC91' || fail 'Fila WhatsApp, remoção de conta e limpeza robusta RC91'
+  sudo -u sgml "$PHP_BIN" scripts/smoke-rc92-admin-throttle-clean-state.php && ok 'Throttles administrativos independentes e limpeza zerada RC92' || fail 'Throttles administrativos independentes e limpeza zerada RC92'
+  sudo -u sgml "$PHP_BIN" scripts/smoke-rc93-whatsapp-purge.php && ok 'Remoção direta de falhas/cancelados WhatsApp RC93' || fail 'Remoção direta de falhas/cancelados WhatsApp RC93'
   if grep -qi 'livewire' /tmp/sgml-route-list.txt; then ok 'Rotas Livewire registradas'; else fail 'Rotas Livewire não encontradas'; fi
 else
   info 'Migrations, rotas, backup e smoke WhatsApp não foram executados porque o vendor está incompatível.'

@@ -89,6 +89,10 @@
             <div class="flex items-center justify-between gap-2"><span class="text-lg font-bold">Backup e restauração</span><span class="sgml-badge bg-emerald-50 text-emerald-700">PostgreSQL</span></div>
             <p class="mt-1 text-sm text-slate-500">Área exclusiva do Administrador para gerar, importar, baixar e restaurar backups portáteis do banco.</p>
         </a>
+        <a href="{{ route('admin.operational-cleanup.index') }}" class="sgml-card block p-5 transition hover:border-rose-200 hover:shadow-md">
+            <div class="flex items-center justify-between gap-2"><span class="text-lg font-bold">Limpeza de dados de teste</span><span class="sgml-badge bg-rose-50 text-rose-700">Protegida</span></div>
+            <p class="mt-1 text-sm text-slate-500">Remove escalas, trocas e resíduos operacionais de homologação, preservando cadastros, biblioteca, ensaios e regras dos cultos.</p>
+        </a>
         <a href="{{ route('admin.whatsapp.index') }}" class="sgml-card block p-5 transition hover:border-indigo-200 hover:shadow-md">
             <div class="flex items-center justify-between gap-2"><span class="text-lg font-bold">Avisos pelo WhatsApp</span><span class="sgml-badge bg-emerald-50 text-emerald-700">Opcional</span></div>
             <p class="mt-1 text-sm text-slate-500">Configure avisos automáticos de escala, repertório e eventos para a equipe do louvor.</p>

@@ -4,14 +4,22 @@
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-4169E1)
 ![License](https://img.shields.io/badge/license-AGPL--3.0-blue)
-![Version](https://img.shields.io/badge/version-1.0.0--rc88-indigo)
+![Version](https://img.shields.io/badge/version-1.0.0--rc94-indigo)
 
 **OurCloud Louvor** é um sistema open source para gestão de ministérios de louvor. Ele reúne agenda, escalas, repertórios, ensaios, disponibilidade, trocas, histórico de ministrações, tons por ministro, eventos, aniversariantes, notificações e integrações em uma única aplicação web responsiva.
 
-> Versão: **1.0.0-rc88 - GitHub/Open Source Edition**  
+> Versão: **1.0.0-rc94 - GitHub/Open Source Edition**  
 > Licença: **GNU Affero General Public License v3.0 (AGPL-3.0)**
 
+> **RC94:** o editor de repertório foi reorganizado em três etapas claras: Abertura opcional, Louvores da ministração e Ordem final, reduzindo a confusão durante a montagem pelo ministro.
+
 ## Principais recursos
+
+- Limpeza protegida de dados de homologação/testes, incluindo Eventos Especiais quando selecionado
+- limpeza realmente zerada das ocorrências recorrentes, com recriação somente quando desejada
+- Remoção segura de contas de acesso com preservação do histórico
+- WhatsApp com fila, retentativas, cancelamento de pendências e teste direto
+- limites administrativos independentes e página 429 amigável
 
 - gestão de pessoas, usuários, papéis e permissões;
 - agenda institucional e agenda individual do ministro;
@@ -20,6 +28,7 @@
 - solicitações e acompanhamento de trocas;
 - biblioteca de louvores, versões, artista, tom original, BPM e referências;
 - repertório por culto com ministro responsável e tom planejado;
+- editor de repertório guiado em 3 etapas, com abertura separada da numeração principal;
 - **memória de tom por ministro + louvor**;
 - ensaios com consulta/ajuste de tom;
 - histórico de músicas efetivamente ministradas;
@@ -241,7 +250,7 @@ Se preferir não usar Git:
 sudo apt update
 sudo apt install -y unzip
 cd /home/ubuntu
-unzip OurCloud-Louvor-v1.0.0-rc88-GitHub.zip
+unzip OurCloud-Louvor-v1.0.0-rc94-GitHub.zip
 cd ourcloud-louvor
 ```
 
@@ -326,6 +335,33 @@ No servidor, o diretório padrão é:
 ```
 
 Backups contêm dados pessoais e **nunca devem ser enviados ao GitHub**.
+
+---
+
+# Limpeza de dados de teste
+
+A partir da RC89, Administradores possuem **Administração → Limpeza de dados de teste**. Essa rotina foi criada para ambientes de homologação ou migrações que trouxeram escalas antigas para uma nova instalação.
+
+Antes da limpeza o SGML cria automaticamente um backup PostgreSQL. A rotina remove dados operacionais recriáveis, como:
+
+- escalas e atribuições;
+- confirmações e trocas;
+- repertórios planejados;
+- execuções de culto usadas em testes;
+- avisos antigos de escala;
+- ocorrências recorrentes materializadas.
+
+São preservados:
+
+- usuários e pessoas;
+- biblioteca de louvores e versões;
+- ensaios e louvores em ensaio;
+- tons lembrados por ministro + louvor;
+- tipos de culto;
+- regras recorrentes e exceções;
+- congregações, locais, disponibilidade e permissões.
+
+As ocorrências recorrentes são então recriadas usando somente as regras atuais. A RC89 também valida cada ocorrência por **data + horário + fuso + instante canônico**, evitando que cópias antigas deslocadas por UTC/fuso sejam tratadas como cultos diferentes. Cultos avulsos/manuais só são removidos quando o Administrador marca explicitamente essa opção.
 
 ---
 

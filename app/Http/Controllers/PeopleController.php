@@ -102,6 +102,10 @@ class PeopleController extends Controller
 
     public function destroy(Person $person)
     {
+        if ($person->user_id) {
+            return back()->withErrors(['person' => 'Esta pessoa possui uma conta de acesso. Remova primeiro a conta em Administração > Usuários e acessos.']);
+        }
+
         $person->delete();
 
         return back()->with('status', 'Pessoa arquivada.');

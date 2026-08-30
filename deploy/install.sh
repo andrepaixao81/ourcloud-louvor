@@ -206,7 +206,7 @@ install -d -o sgml -g sgml -m 0770 storage/framework/cache storage/framework/ses
 # Arquivo .env inicial.
 cat > .env <<EOF_ENV
 APP_NAME="OurCloud Louvor"
-APP_VERSION=1.0.0-rc88
+APP_VERSION=1.0.0-rc94
 APP_ENV=production
 APP_KEY=${RESTORED_APP_KEY}
 APP_DEBUG=false
@@ -291,6 +291,7 @@ php8.3 scripts/smoke-rc85-friendly-403.php
 php8.3 scripts/smoke-rc86-birthday-privacy-backup-runtime.php
 php8.3 scripts/smoke-rc87-birthday-member-only-backup-path.php
 php8.3 scripts/smoke-rc88-open-source.php
+php8.3 scripts/smoke-rc89-operational-cleanup-recurrence.php
 node --check resources/js/app.js
 export COMPOSER_ALLOW_SUPERUSER=1
 if [[ -f composer.lock ]]; then

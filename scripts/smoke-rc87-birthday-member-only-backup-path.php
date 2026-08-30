@@ -16,7 +16,7 @@ $install = $read('deploy/install.sh');
 $verify = $read('scripts/verify-install.sh');
 $actions = $read('app/Http/Controllers/ActionCenterController.php');
 
-$check(in_array(trim($read('VERSION')), ['1.0.0-rc87', '1.0.0-rc88'], true), 'Linha RC87+ identificada.');
+$check(in_array(trim($read('VERSION')), ['1.0.0-rc87', '1.0.0-rc88', '1.0.0-rc89', '1.0.0-rc90', '1.0.0-rc91', '1.0.0-rc92', '1.0.0-rc93', '1.0.0-rc94'], true), 'Linha RC87+ identificada.');
 $check(str_contains($user, 'somente o Membro comum fica sem acesso') && str_contains($user, 'return ! $this->isMemberWithoutMinistryAccess();'), 'Somente Membro comum é bloqueado em aniversariantes.');
 $check(str_contains($migration, "where('slug', 'member')") && str_contains($migration, "['administrator', 'ministry_manager', 'minister', 'participant', 'leadership']"), 'Migration RC87 retira Membro e concede visualização aos perfis autorizados.');
 $check(str_contains($seeder, "'special_events.respond','birthdays.view'") && str_contains($seeder, "'participant' => ['Participante do Louvor'") && substr_count($seeder, "'birthdays.view'") >= 4, 'Seeder concede birthdays.view a Ministro/Participante e mantém Membro sem permissão.');

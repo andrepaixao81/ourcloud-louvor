@@ -38,7 +38,7 @@ $pdf = $read('app/Services/SchedulePdfService.php');
 $songShow = $read('resources/views/songs/show.blade.php');
 $install = $read('deploy/install.sh');
 
-$check(in_array(trim($read('VERSION')), ['1.0.0-rc84', '1.0.0-rc85', '1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88'], true), 'Versão da distribuição é RC84.');
+$check(in_array(trim($read('VERSION')), ['1.0.0-rc84', '1.0.0-rc85', '1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88', '1.0.0-rc89', '1.0.0-rc90', '1.0.0-rc91', '1.0.0-rc92', '1.0.0-rc93', '1.0.0-rc94'], true), 'Versão da distribuição é RC84.');
 $check(str_contains($migration, "Schema::create('minister_song_keys'"), 'Migration cria memória de tom por ministro e louvor.');
 $check(str_contains($migration, "minister_person_id") && str_contains($migration, "opening_minister_person_id"), 'Repertório vincula cada louvor e abertura ao ministro responsável.');
 $check(str_contains($keyService, 'preferredKey') && str_contains($keyService, 'remember('), 'Serviço consulta e memoriza o tom personalizado.');
@@ -54,7 +54,7 @@ $check(str_contains($executionController, 'item->minister_person_id') && str_con
 $check(str_contains($calendar, 'Ministro:') && str_contains($calendar, 'repertoire.items.minister'), 'Calendário sincronizado informa ministro e tom do louvor.');
 $check(str_contains($pdf, 'openingMinister') && str_contains($pdf, 'item->minister'), 'PDF da escala inclui o ministro responsável por cada louvor.');
 $check(str_contains($songShow, 'Tons lembrados por ministro'), 'Biblioteca do louvor exibe os tons lembrados por ministro.');
-$check(str_contains($install, 'APP_VERSION=1.0.0-rc88') && str_contains($install, 'smoke-rc84-minister-song-keys.php'), 'Instalação limpa provisiona e valida a RC84.');
+$check(str_contains($install, 'APP_VERSION=1.0.0-rc94') && str_contains($install, 'smoke-rc84-minister-song-keys.php'), 'Instalação limpa provisiona e valida a RC84.');
 
 if ($failures > 0) {
     fwrite(STDERR, "\nRC84: {$failures} de {$checks} verificações falharam.\n");

@@ -460,7 +460,7 @@ class ScheduleController extends Controller
             'Acesse o SGML para consultar ministros, cultos, trocas e repertórios.',
         ]);
 
-        $teamNotifications->announce(
+        $announcement = $teamNotifications->announce(
             $request->user()->organization_id,
             'Escala publicada - '.$month->translatedFormat('F/Y'),
             $scheduleSummary,
@@ -474,9 +474,13 @@ class ScheduleController extends Controller
         if (($recurrenceSync['cancelled'] ?? 0) > 0) {
             $message .= ' '.($recurrenceSync['cancelled']).' ocorrência(s) antiga(s) incompatível(is) foi(ram) retirada(s) antes da publicação.';
         }
-        $message .= $sendWhatsapp
-            ? ' O aviso da escala foi enfileirado para WhatsApp e também registrado no SGML.'
-            : ' O aviso foi registrado no SGML; envio por WhatsApp desmarcado nesta publicação.';
+        if (! $sendWhatsapp) {
+            $message .= ' O aviso foi registrado no SGML; envio por WhatsApp desmarcado nesta publicação.';
+        } elseif (($announcement['whatsapp_queued'] ?? 0) > 0) {
+            $message .= ' '.($announcement['whatsapp_queued']).' aviso(s) foram enfileirado(s) para WhatsApp com envio espaçado, além do registro interno no SGML.';
+        } else {
+            $message .= ' O WhatsApp foi solicitado, mas nenhum envio pôde ser enfileirado. Verifique se a integração está habilitada e se os integrantes possuem telefone válido.';
+        }
 
         return back()->with('status', $message);
     }

@@ -5,6 +5,7 @@ use App\Http\Controllers\ActionCenterController;
 use App\Http\Controllers\AdminCatalogController;
 use App\Http\Controllers\AdminAssistanceController;
 use App\Http\Controllers\AdminMinisterEligibilityController;
+use App\Http\Controllers\AdminOperationalCleanupController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AdministrationController;
 use App\Http\Controllers\AuditController;
@@ -215,13 +216,18 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin', [AdministrationController::class, 'index'])->name('admin.index');
     Route::get('/admin/backups', [DatabaseBackupController::class, 'index'])->middleware('administrator')->name('admin.backups.index');
+    Route::get('/admin/operational-cleanup', [AdminOperationalCleanupController::class, 'index'])->middleware('administrator')->name('admin.operational-cleanup.index');
+    Route::delete('/admin/operational-cleanup', [AdminOperationalCleanupController::class, 'destroy'])->middleware(['administrator', 'throttle:admin-operational-cleanup'])->name('admin.operational-cleanup.destroy');
     Route::get('/admin/whatsapp', [WhatsappSettingsController::class, 'index'])->middleware(['administrator','permission:administration.whatsapp'])->name('admin.whatsapp.index');
     Route::patch('/admin/whatsapp', [WhatsappSettingsController::class, 'update'])->middleware(['administrator','permission:administration.whatsapp'])->name('admin.whatsapp.update');
-    Route::post('/admin/whatsapp/check', [WhatsappSettingsController::class, 'check'])->middleware(['administrator','permission:administration.whatsapp','throttle:6,5'])->name('admin.whatsapp.check');
-    Route::post('/admin/whatsapp/test', [WhatsappSettingsController::class, 'test'])->middleware(['administrator','permission:administration.whatsapp','throttle:3,5'])->name('admin.whatsapp.test');
-    Route::post('/admin/backups', [DatabaseBackupController::class, 'store'])->middleware(['administrator', 'throttle:2,10'])->name('admin.backups.store');
-    Route::post('/admin/backups/import', [DatabaseBackupController::class, 'import'])->middleware(['administrator', 'throttle:2,10'])->name('admin.backups.import');
-    Route::post('/admin/backups/{filename}/restore', [DatabaseBackupController::class, 'restore'])->middleware(['administrator', 'throttle:1,10'])->where('filename', 'sgml-db-[0-9_\-a-f]+\.dump')->name('admin.backups.restore');
+    Route::post('/admin/whatsapp/check', [WhatsappSettingsController::class, 'check'])->middleware(['administrator','permission:administration.whatsapp','throttle:admin-whatsapp'])->name('admin.whatsapp.check');
+    Route::post('/admin/whatsapp/test', [WhatsappSettingsController::class, 'test'])->middleware(['administrator','permission:administration.whatsapp','throttle:admin-whatsapp'])->name('admin.whatsapp.test');
+    Route::post('/admin/whatsapp/retry-failed', [WhatsappSettingsController::class, 'retryFailed'])->middleware(['administrator','permission:administration.whatsapp','throttle:admin-whatsapp'])->name('admin.whatsapp.retry-failed');
+    Route::post('/admin/whatsapp/clear-queue', [WhatsappSettingsController::class, 'clearQueue'])->middleware(['administrator','permission:administration.whatsapp','throttle:admin-whatsapp'])->name('admin.whatsapp.clear-queue');
+    Route::delete('/admin/whatsapp/purge-unsent', [WhatsappSettingsController::class, 'purgeUnsentHistory'])->middleware(['administrator','permission:administration.whatsapp','throttle:admin-whatsapp'])->name('admin.whatsapp.purge-unsent');
+    Route::post('/admin/backups', [DatabaseBackupController::class, 'store'])->middleware(['administrator', 'throttle:admin-backup-write'])->name('admin.backups.store');
+    Route::post('/admin/backups/import', [DatabaseBackupController::class, 'import'])->middleware(['administrator', 'throttle:admin-backup-write'])->name('admin.backups.import');
+    Route::post('/admin/backups/{filename}/restore', [DatabaseBackupController::class, 'restore'])->middleware(['administrator', 'throttle:admin-backup-restore'])->where('filename', 'sgml-db-[0-9_\-a-f]+\.dump')->name('admin.backups.restore');
     Route::get('/admin/backups/{filename}', [DatabaseBackupController::class, 'download'])->middleware('administrator')->where('filename', 'sgml-db-[0-9_\-a-f]+\.dump')->name('admin.backups.download');
     Route::delete('/admin/backups/{filename}', [DatabaseBackupController::class, 'destroy'])->middleware('administrator')->where('filename', 'sgml-db-[0-9_\-a-f]+\.dump')->name('admin.backups.destroy');
     Route::post('/admin/assistance/start', [AdminAssistanceController::class, 'start'])->name('admin.assistance.start');
@@ -243,6 +249,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/users', [AdminUserController::class, 'index'])->middleware(['administrator', 'permission:users.permissions'])->name('admin.users');
     Route::post('/admin/users', [AdminUserController::class, 'store'])->middleware(['administrator', 'permission:users.create'])->name('admin.users.store');
     Route::patch('/admin/users/{user}', [AdminUserController::class, 'update'])->middleware(['administrator', 'permission:users.permissions'])->name('admin.users.update');
+    Route::delete('/admin/users/{user}', [AdminUserController::class, 'destroy'])->middleware(['administrator', 'permission:users.disable', 'throttle:admin-user-removal'])->name('admin.users.destroy');
     Route::post('/admin/users/{user}/reset-password', [AdminUserController::class, 'resetPassword'])->middleware(['administrator', 'permission:users.permissions'])->name('admin.users.password.reset');
     Route::post('/admin/roles', [AdminUserController::class, 'storeRole'])->middleware(['administrator', 'permission:users.permissions'])->name('admin.roles.store');
     Route::patch('/admin/roles/{role}', [AdminUserController::class, 'updateRole'])->middleware(['administrator', 'permission:users.permissions'])->name('admin.roles.update');
@@ -258,7 +265,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/mail', [MailSettingsController::class, 'index'])->middleware(['administrator', 'permission:administration.mail'])->name('admin.mail.index');
     Route::patch('/admin/mail', [MailSettingsController::class, 'update'])->middleware(['administrator', 'permission:administration.mail'])->name('admin.mail.update');
-    Route::post('/admin/mail/test', [MailSettingsController::class, 'test'])->middleware(['administrator', 'permission:administration.mail', 'throttle:5,1'])->name('admin.mail.test');
+    Route::post('/admin/mail/test', [MailSettingsController::class, 'test'])->middleware(['administrator', 'permission:administration.mail', 'throttle:admin-mail-test'])->name('admin.mail.test');
 
 
     Route::get('/integrations/google', [GoogleIntegrationController::class, 'index'])->middleware('permission:administration.integrations')->name('integrations.index');

@@ -24,14 +24,14 @@ $check(str_contains($component, 'function selectOpeningSong'), 'Componente possu
 $check(str_contains($component, 'function selectSong'), 'Componente possui seleção explícita dos louvores numerados.');
 $check(str_contains($view, 'wire:model.live.debounce.300ms="openingSongSearch"'), 'Busca da abertura é reativa.');
 $check(str_contains($view, 'wire:model.live.debounce.300ms="songSearch"'), 'Busca dos louvores numerados é reativa.');
-$check(str_contains($view, 'Adicionar louvores ao repertório'), 'Bloco de inclusão dos Louvores 1, 2, 3... está visível.');
+$check(str_contains($view, 'Adicionar louvores da ministração'), 'Bloco de inclusão dos Louvores 1, 2, 3... está visível.');
 $check(str_contains($component, 'public bool $songSearchResultsOpen = false;'), 'Resultados da busca de louvores possuem estado explícito de abertura/fechamento.');
 $check(str_contains($component, 'public bool $openingSearchResultsOpen = false;'), 'Resultados da busca de abertura possuem estado explícito de abertura/fechamento.');
 $check(str_contains($component, '$this->songSearchResultsOpen = false;'), 'Selecionar um louvor fecha a caixa de resultados do repertório.');
 $check(str_contains($component, '$this->openingSearchResultsOpen = false;'), 'Selecionar abertura fecha a caixa de resultados de abertura.');
 $check(str_contains($view, 'trim($songSearch) !== \'\' && $songSearchResultsOpen'), 'Lista de resultados do repertório só permanece visível enquanto estiver aberta.');
 $check(str_contains($view, 'trim($openingSongSearch) !== \'\' && $openingSearchResultsOpen'), 'Lista de resultados da abertura só permanece visível enquanto estiver aberta.');
-$check(strpos($view, 'Adicionar louvores ao repertório') < strpos($view, 'Louvores do repertório'), 'Inclusão aparece antes da lista de louvores, no fluxo natural de montagem.');
+$check(strpos($view, 'Adicionar louvores da ministração') < strpos($view, 'Louvores principais'), 'Inclusão aparece antes da lista de louvores, no fluxo natural de montagem.');
 $check(str_contains($view, 'Adicionar louvor ao repertório'), 'Botão explícito de adicionar louvor está presente.');
 
 $check(str_contains($component, 'function addSelectedSong'), 'Ação explícita addSelectedSong está disponível.');
@@ -41,7 +41,7 @@ $check(str_contains($view, 'wire:loading') && str_contains($view, 'Adicionando..
 $check(str_contains($component, "addError('addSong'"), 'Falha de inclusão é exibida ao usuário em vez de parecer botão inerte.');
 $check(str_contains(file_get_contents($root.'/app/Services/RepertoireService.php') ?: '', 'Uma falha transitória de projeção'), 'Falha secundária de projeção não invalida a persistência principal do repertório.');
 $check(str_contains($view, 'Cadastrar e adicionar ao repertório'), 'Cadastro rápido de música ausente permanece disponível.');
-$check(str_contains($view, 'Confirmar repertório e avisar equipe'), 'Confirmação final do repertório permanece disponível.');
+$check(str_contains($view, 'Repertório pronto? Avisar a equipe'), 'Confirmação final do repertório permanece disponível.');
 $check(str_contains($update, 'smoke-repertoire-livewire.php'), 'Atualizador valida o editor interativo antes de concluir.');
 $check(str_contains($install, 'smoke-repertoire-livewire.php'), 'Instalador valida o editor interativo.');
 

@@ -1,7 +1,7 @@
 <?php
 $root = dirname(__DIR__);
 $checks = [
-    'versão RC85' => in_array(trim(file_get_contents($root.'/VERSION')), ['1.0.0-rc85', '1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88'], true),
+    'versão RC85' => in_array(trim(file_get_contents($root.'/VERSION')), ['1.0.0-rc85', '1.0.0-rc86', '1.0.0-rc87', '1.0.0-rc88', '1.0.0-rc89', '1.0.0-rc90', '1.0.0-rc91', '1.0.0-rc92', '1.0.0-rc93', '1.0.0-rc94'], true),
     'view 403 amigável' => is_file($root.'/resources/views/errors/403.blade.php'),
     '403 contextual Central de Ações' => str_contains(file_get_contents($root.'/resources/views/errors/403.blade.php'), 'action_item_context'),
     '403 permite dispensar aviso' => str_contains(file_get_contents($root.'/resources/views/errors/403.blade.php'), "route('actions.dismiss'"),

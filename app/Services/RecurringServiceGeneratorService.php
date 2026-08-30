@@ -202,11 +202,54 @@ class RecurringServiceGeneratorService
 
     private function serviceOccurrenceAllowed(Service $service, RecurringServiceRule $rule): bool
     {
+        $timezone = $rule->timezone ?: $service->timezone ?: config('app.timezone');
         $original = $this->originalOccurrenceDate($service, $rule);
-        $allowed = collect($this->datesForRule($rule, $original->copy()->startOfMonth()))
-            ->contains(fn (Carbon $date) => $date->format('Y-m-d') === $original->format('Y-m-d'));
 
-        return $allowed;
+        // RC89: a identidade de uma ocorrência recorrente é data + horário original
+        // + fuso, e não apenas o dia do calendário. Versões antigas chegaram a
+        // materializar a mesma regra duas vezes com diferença de 3 horas (UTC x
+        // America/Sao_Paulo). Comparar somente Y-m-d fazia as duas cópias parecerem
+        // válidas e a escala passava a enxergar dezenas de cultos inexistentes.
+        $expectedKeys = collect($this->datesForRule($rule, $original->copy()->startOfMonth()))
+            ->map(function (Carbon $date) use ($rule, $timezone): string {
+                $starts = Carbon::parse($date->format('Y-m-d').' '.$rule->starts_time, $timezone);
+                return $starts->format('Y-m-d\TH:i:s').'@'.$timezone;
+            });
+
+        $storedKey = trim((string) $service->recurrence_occurrence_key);
+        if ($storedKey !== '') {
+            if (! $expectedKeys->contains($storedKey)) {
+                return false;
+            }
+
+            $exception = RecurrenceException::query()
+                ->where('recurring_rule_id', $rule->id)
+                ->where('occurrence_key', $storedKey)
+                ->first();
+            if ($exception?->exception_type === 'skipped') {
+                return false;
+            }
+
+            // A chave pode ter sobrevivido a uma implementação antiga que gravou
+            // starts_at com outro fuso. Validamos também o instante canônico. Em
+            // exceções modificadas, o novo horário é a referência correta.
+            $raw = str_contains($storedKey, '@') ? strstr($storedKey, '@', true) : $storedKey;
+            try {
+                $canonicalStart = $exception?->new_starts_at
+                    ?: Carbon::createFromFormat('Y-m-d\TH:i:s', $raw, $timezone);
+                if (! $service->starts_at->equalTo($canonicalStart)) {
+                    return false;
+                }
+            } catch (\Throwable) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Compatibilidade com materializações muito antigas que não possuíam chave.
+        $fallbackKey = $service->starts_at->copy()->timezone($timezone)->format('Y-m-d\TH:i:s').'@'.$timezone;
+        return $expectedKeys->contains($fallbackKey);
     }
 
     private function originalOccurrenceDate(Service $service, RecurringServiceRule $rule): Carbon

@@ -14,7 +14,7 @@ Exemplo:
 
 ```bash
 cd /home/ubuntu
-unzip OurCloud-Louvor-v1.0.0-rc88-GitHub.zip
+unzip OurCloud-Louvor-v1.0.0-rc94-GitHub.zip
 cd ourcloud-louvor
 ```
 

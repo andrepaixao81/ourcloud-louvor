@@ -18,7 +18,7 @@ $envExample = $read('.env.example');
 $install = $read('deploy/install.sh');
 $workflow = $read('.github/workflows/quality.yml');
 
-$check($version === '1.0.0-rc88', 'Versão RC88 identificada.');
+$check(in_array($version, ['1.0.0-rc88', '1.0.0-rc89', '1.0.0-rc90', '1.0.0-rc91', '1.0.0-rc92', '1.0.0-rc93', '1.0.0-rc94'], true), 'Linha RC88+ open source identificada.');
 $check(($composer['name'] ?? null) === 'ourcloud/sgml', 'composer.json preserva o identificador do pacote SGML.');
 $check(($composer['license'] ?? null) === 'AGPL-3.0-only', 'composer.json declara AGPL-3.0-only.');
 $check(str_contains($license, 'GNU AFFERO GENERAL PUBLIC LICENSE') && str_contains($license, 'Version 3, 19 November 2007'), 'LICENSE contém AGPL v3.');

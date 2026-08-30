@@ -25,6 +25,19 @@ class WhatsappSetting extends BaseModel
             : self::PROVIDER_META;
     }
 
+
+    public function batchSpacingSeconds(): int
+    {
+        if ($this->selectedProvider() !== self::PROVIDER_EVOLUTION) {
+            return 1;
+        }
+
+        // Evolution pode encerrar a conexão quando recebe muitos POSTs ao mesmo
+        // tempo. O delay configurado continua indo no payload e também orienta o
+        // espaçamento do lote, com piso seguro de 2 segundos entre requisições.
+        return max(2, (int) ceil(max(0, (int) ($this->evolution_delay_ms ?? 500)) / 1000));
+    }
+
     public function isConfigured(): bool
     {
         if (! $this->enabled) {

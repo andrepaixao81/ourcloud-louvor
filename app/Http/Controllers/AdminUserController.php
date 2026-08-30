@@ -10,6 +10,7 @@ use App\Models\UserPermissionOverride;
 use App\Services\AuditService;
 use App\Services\OrganizationMailSettingsService;
 use App\Services\UserPersonProfileService;
+use App\Services\UserAccountRemovalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -256,6 +257,54 @@ class AdminUserController extends Controller
         ]);
 
         return back()->with('status', 'Usuário e vínculo ministerial atualizados.');
+    }
+
+    public function destroy(Request $request, User $user, AuditService $audit, UserAccountRemovalService $removal)
+    {
+        abort_unless($user->organization_id === $request->user()->organization_id, 404);
+
+        $data = $request->validate([
+            'reason' => ['required', 'string', 'min:5', 'max:500'],
+            'password' => ['required', 'string'],
+            'confirmation' => ['required', 'in:EXCLUIR CONTA'],
+            'archive_person' => ['nullable', 'boolean'],
+        ]);
+
+        if (! Hash::check($data['password'], $request->user()->password)) {
+            throw ValidationException::withMessages(['password' => 'Senha administrativa inválida.']);
+        }
+        if ($user->is($request->user())) {
+            throw ValidationException::withMessages(['confirmation' => 'Você não pode remover a própria conta enquanto está autenticado.']);
+        }
+
+        if ($user->isAdministrator()) {
+            $otherActiveAdmins = User::query()
+                ->where('organization_id', $user->organization_id)
+                ->where('active', true)
+                ->where('id', '!=', $user->id)
+                ->whereHas('roles', fn ($query) => $query->where('slug', 'administrator'))
+                ->count();
+            if ($otherActiveAdmins === 0) {
+                throw ValidationException::withMessages(['confirmation' => 'Esta é a última conta administrativa ativa. Crie ou habilite outro Administrador antes de removê-la.']);
+            }
+        }
+
+        try {
+            $result = $removal->remove(
+                $user,
+                $request->user(),
+                (string) $data['reason'],
+                $request->boolean('archive_person'),
+            );
+        } catch (\Throwable $exception) {
+            report($exception);
+            $reference = strtoupper(substr(hash('sha256', $exception->getMessage().microtime(true)), 0, 10));
+            return back()->with('error', 'Não foi possível remover a conta. Nenhuma alteração parcial foi mantida. Referência: '.$reference.'. Consulte o log do servidor se o problema persistir.');
+        }
+
+        return redirect()->route('admin.users')->with('status', ($result['archived_person'] ?? false)
+            ? 'Conta removida e cadastro pessoal arquivado. O histórico operacional foi preservado.'
+            : 'Conta removida do sistema. O cadastro da pessoa e o histórico ministerial foram preservados.');
     }
 
     public function resetPassword(Request $request, User $user, AuditService $audit, OrganizationMailSettingsService $mailSettings)

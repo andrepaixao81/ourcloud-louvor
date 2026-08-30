@@ -2,7 +2,7 @@
 
 return [
     'name' => env('APP_NAME', 'OurCloud Louvor'),
-    'version' => env('APP_VERSION', '1.0.0-rc88'),
+    'version' => env('APP_VERSION', '1.0.0-rc94'),
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
