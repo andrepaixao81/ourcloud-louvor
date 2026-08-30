@@ -1,0 +1,54 @@
+name: Relatar bug
+description: Informe um problema reproduzível no OurCloud Louvor
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por ajudar. **Não inclua `.env`, senhas, APP_KEY, dumps, cookies ou dados pessoais.**
+  - type: input
+    id: version
+    attributes:
+      label: Versão
+      placeholder: "1.0.0-rc88"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Tipo de ambiente
+      options:
+        - Ubuntu 24.04 - instalação automatizada
+        - Desenvolvimento local
+        - Outro
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o comportamento observado.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. Acesse...
+        2. Clique em...
+        3. O erro aparece...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs sanitizados
+      description: Remova nomes, e-mails, telefones, tokens, cookies e credenciais.

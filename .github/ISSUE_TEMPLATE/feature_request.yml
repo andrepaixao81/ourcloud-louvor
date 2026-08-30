@@ -1,0 +1,31 @@
+name: Sugerir melhoria
+description: Proponha uma melhoria funcional ou de experiência
+title: "[Melhoria]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Problema ou necessidade
+      description: Qual situação da rotina do ministério você quer melhorar?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Solução sugerida
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Impactos percebidos
+      options:
+        - label: Pode alterar banco/migrations
+        - label: Pode alterar permissões/perfis
+        - label: Pode alterar interface/mobile
+        - label: Pode alterar integrações/notificações

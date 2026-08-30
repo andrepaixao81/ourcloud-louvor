@@ -1,0 +1,10 @@
+[Unit]
+Description=Executa o scheduler do SGML a cada minuto
+
+[Timer]
+OnCalendar=*-*-* *:*:00
+Persistent=true
+Unit=sgml-scheduler.service
+
+[Install]
+WantedBy=timers.target

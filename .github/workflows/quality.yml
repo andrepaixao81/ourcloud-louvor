@@ -1,0 +1,75 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, xml, curl, zip, intl, bcmath, gd, sqlite3
+          coverage: none
+          tools: composer:v2
+
+      - name: Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Validate Composer metadata
+        run: composer validate --strict --no-check-publish
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          touch database/database.sqlite
+          php artisan key:generate --force
+
+      - name: PHP syntax
+        run: |
+          find app bootstrap config database routes scripts tests -type f -name '*.php' -print0 \
+            | xargs -0 -n1 php -l
+
+      - name: Static release smoke tests
+        run: |
+          php scripts/smoke-release-platform.php
+          php scripts/smoke-repertoire-livewire.php
+          php scripts/smoke-rehearsal-ux.php
+          php scripts/smoke-song-reference.php
+          php scripts/smoke-vite-asset-paths.php
+          php scripts/smoke-rc83-uiux.php
+          php scripts/smoke-rc84-minister-song-keys.php
+          php scripts/smoke-rc85-friendly-403.php
+          php scripts/smoke-rc86-birthday-privacy-backup-runtime.php
+          php scripts/smoke-rc87-birthday-member-only-backup-path.php
+          php scripts/smoke-rc88-open-source.php
+
+      - name: Install frontend dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: JavaScript syntax
+        run: node --check resources/js/app.js
+
+      - name: Laravel tests
+        run: php artisan test

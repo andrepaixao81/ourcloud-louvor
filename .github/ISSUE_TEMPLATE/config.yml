@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Vulnerabilidade de segurança
+    url: https://github.com/SEU_USUARIO/ourcloud-louvor/security/advisories/new
+    about: Não publique vulnerabilidades exploráveis em Issues. Use um advisory privado quando o repositório estiver publicado.

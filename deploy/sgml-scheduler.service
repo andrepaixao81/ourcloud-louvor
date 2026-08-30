@@ -1,0 +1,11 @@
+[Unit]
+Description=SGML Laravel Scheduler
+After=network-online.target php8.3-fpm.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=sgml
+Group=sgml
+WorkingDirectory=/var/www/sgml
+ExecStart=/usr/bin/php8.3 artisan schedule:run

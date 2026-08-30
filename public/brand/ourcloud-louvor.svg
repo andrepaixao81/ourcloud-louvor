@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">OurCloud Louvor</title>
+  <desc id="desc">Nuvem com barras musicais, símbolo do sistema de gestão do Ministério de Louvor.</desc>
+  <defs>
+    <linearGradient id="g" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#0891B2"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="url(#g)"/>
+  <path d="M19.1 43.8h27.4c5.7 0 10.3-4.3 10.3-9.7 0-5-4-9.2-9.2-9.7C45.8 18.8 40.5 15 34.4 15c-7.3 0-13.3 5.4-14.1 12.4-5.1.5-9.1 4-9.1 8.2 0 4.5 3.5 8.2 7.9 8.2Z" fill="white" opacity=".98"/>
+  <rect x="23" y="31" width="4" height="8" rx="2" fill="#4F46E5"/>
+  <rect x="30" y="26" width="4" height="13" rx="2" fill="#4F46E5"/>
+  <rect x="37" y="29" width="4" height="10" rx="2" fill="#0891B2"/>
+  <circle cx="25" cy="40.5" r="3" fill="#4F46E5"/>
+  <circle cx="32" cy="40.5" r="3" fill="#4F46E5"/>
+  <circle cx="39" cy="40.5" r="3" fill="#0891B2"/>
+</svg>

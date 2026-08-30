@@ -1,0 +1,77 @@
+# Laravel / PHP
+/vendor/
+.env
+.env.*
+!.env.example
+.phpunit.result.cache
+.phpunit.cache/
+auth.json
+
+# Node / frontend
+/node_modules/
+/public/build/
+/public/hot
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime Laravel
+/storage/*.key
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/storage/app/private/*
+/storage/app/*.dump
+/storage/app/*.sql
+/storage/app/*.zip
+/bootstrap/cache/*.php
+/public/storage
+
+# Banco / backups / exports
+*.dump
+*.dump.sha256
+*.sql
+*.sqlite
+*.sqlite3
+*.backup
+*.bak
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.zip
+!docs/**/*.zip
+
+# Segredos / certificados
+sgml-app-key.txt
+sgml-old.env
+sgml-install-secrets.txt
+*app-key*.txt
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.csr
+*.jks
+*.keystore
+
+# IDE / sistema operacional
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Testes / cobertura
+coverage/
+.phpunit.cache/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.log
+/tmp/
